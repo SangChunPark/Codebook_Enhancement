@@ -1,5 +1,5 @@
 clear, clc, close all
-
+tic
 addpath('function', 'channel', 'codebook')
 
 %% Generate channels
@@ -40,11 +40,6 @@ if ~isfolder('Figure_3/channel')
 end
 save(['Figure_3/channel/H', num2str(BS.H), 'V', num2str(BS.V), '_sigmaL_', num2str(ch.sigma_L)], 'channel')
 
-% Environment Setup
-H = 8;                  % The number of horizontal elements
-V = 8;                  % The number of vertical elements
-Q = 64;                 % Codebook size
-
 channel = channel./sqrt(sum(abs(channel).^2, 2));
 len_ch  = length(channel);
 channel2= channel;
@@ -59,20 +54,22 @@ O1 = 1;                 % The horizontal oversampling factor
 O2 = 1;                 % The vertical oversampling factor
 Q  = N1*N2*O1*O2;       % Codebook size
 
-% Generate the DFT codebook with a codebook size of Q = N1*N2*O1*O2 - [DFT.codebook]
-% And generate directions for each DFT codevector                   - [DFT.sph]
-% Reference: 3GPP TS 38.214 5.2.2.2 Precoding matrix indicator (PMI)
-DFT = Codebook_DFT(N1, N2, O1, O2);
-
 % Save the DFT codebook
 if ~isfolder('Figure_3/codebook')
     mkdir('Figure_3/codebook')
     addpath('Figure_3/codebook')
 end
+
+% Generate the DFT codebook with a codebook size of Q = N1*N2*O1*O2 - [DFT.codebook]
+% And generate directions for each DFT codevector                   - [DFT.sph]
+% Reference: 3GPP TS 38.214 5.2.2.2 Precoding matrix indicator (PMI)
+DFT = Codebook_DFT(N1, N2, O1, O2);
+
 save(['Figure_3/codebook/DFT_codebook_H', num2str(H), 'V', num2str(V), '_Q', num2str(Q)], 'DFT')
 initial_codebook        = DFT.codebook;
 initial_codebook_sph    = DFT.sph;
 
+%% Search parameters for codebook enhancement
 % Remove codevectors which are non-unidirectivity in the initial codebook
 ind_rem = (isnan(sum(initial_codebook_sph)) | isinf(sum(initial_codebook_sph)));
 for i = 1 : Q
@@ -83,7 +80,6 @@ end
 initial_codebook(:, ind_rem) = [];
 initial_codebook_sph(:, ind_rem) = [];
 
-%% Search parameters for codebook enhancement
 % Parameter setup for kernel density estimation
 alpha_cand     = 0.1 : 0.2 : 0.7;           % Smooth parameter for KDE
 beta_cand      = 2.^(2 : 4);                % Initial bandwidth of KDE
@@ -94,7 +90,7 @@ gap       = 0.5;
 KDE_setup
 
 num_search = 0;
-max_search = 10;
+max_search = 5;
 while num_search < max_search
 
     max_iteration   = 6;
@@ -248,3 +244,4 @@ xlabel('The number of iterations')
 ylabel('Beamforming gain')
 
 set(gca,'FontSize', 14, 'FontName', 'Arial')
+toc

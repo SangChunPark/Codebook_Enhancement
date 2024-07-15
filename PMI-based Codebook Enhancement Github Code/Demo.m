@@ -132,7 +132,6 @@ KDE_setup
 
 max_iteration   = 6;
 iteration       = 0;
-% Codebook Enhancement (Step 1 to Step 3)
 
 while iteration < max_iteration
 
