@@ -1,5 +1,5 @@
 # Codebook_Enhancement
-PMI-Based Codebook Enhancement for Efficient Reference Signaling
+Advanced Codebook Generation Using High-Resolution k-Means Clustering to PMI data
 
 
 e-mail: ppp103207@sogang.ac.kr
